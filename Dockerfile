@@ -45,25 +45,27 @@ RUN cd /opt/zephyr-sdk-$ZSDK_VERSION && yes | ./setup.sh
 
 FROM sdk_stage AS src_stage
 ADD west.yml /opt/zephyr-sdk-$ZSDK_VERSION/
+
+# Create non-root user
+RUN useradd -m -s /bin/bash user
 RUN mkdir /zephyrproject 
+RUN chown -R user:user /zephyrproject
+USER user
 WORKDIR /zephyrproject
 RUN west init -l --mf /opt/zephyr-sdk-0.16.6/west.yml test && west update
 
 FROM src_stage AS final
-
-# Create non-root user
-RUN useradd -m -s /bin/bash user && \
-    apt update && \
-    DEBIAN_FRONTEND=noninteractive apt install -y sudo && \
-    usermod -aG sudo user && \
-    echo "user ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
-    apt clean && \
-    rm -rf /var/lib/apt/lists/*
-RUN mkdir /workspace && chown user:user /workspace
-
-# Switch to non-root user
+RUN git clone --branch v3.6.0 --depth 1 \
+    https://github.com/zephyrproject-rtos/example-application.git
+USER root
+ADD example-application.yml /zephyrproject/example-application/west.yml
+ADD west_config /zephyrproject/.west/config
+ADD west.yml /zephyrproject/west.yml
+RUN chown user:user /zephyrproject/west.yml \
+    /zephyrproject/example-application/west.yml \
+    /zephyrproject/.west/config
 USER user
-WORKDIR /workspace
+WORKDIR /zephyrproject/example-application
 
 # Default command
 CMD ["/bin/bash"]
