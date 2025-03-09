@@ -1,0 +1,30 @@
+# Build directories
+build/
+build-*/
+
+# Python virtual environment
+.venv/
+venv/
+ENV/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# West installation
+.west/
+
+# IDE specific files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# Zephyr specific
+outdir/
+twister-out*/ 
