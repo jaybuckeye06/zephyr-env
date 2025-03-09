@@ -43,4 +43,28 @@ ADD sdk_toolchains /opt/zephyr-sdk-$ZSDK_VERSION/
 
 RUN cd /opt/zephyr-sdk-$ZSDK_VERSION && yes | ./setup.sh
 
-# FROM sdk_stage AS src_stage
+FROM sdk_stage AS src_stage
+ADD west.yml /opt/zephyr-sdk-$ZSDK_VERSION/
+RUN mkdir /zephyrproject 
+WORKDIR /zephyrproject
+RUN west init -l --mf /opt/zephyr-sdk-0.16.6/west.yml test && west update
+
+FROM src_stage AS final
+
+# Create non-root user
+RUN useradd -m -s /bin/bash user && \
+    apt update && \
+    DEBIAN_FRONTEND=noninteractive apt install -y sudo && \
+    usermod -aG sudo user && \
+    echo "user ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
+    apt clean && \
+    rm -rf /var/lib/apt/lists/*
+RUN mkdir /workspace && chown user:user /workspace
+
+# Switch to non-root user
+USER user
+WORKDIR /workspace
+
+# Default command
+CMD ["/bin/bash"]
+
