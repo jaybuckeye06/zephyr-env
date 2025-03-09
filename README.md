@@ -33,6 +33,11 @@ Mount your project directory:
 docker run -it --rm -v $(pwd):/workdir zephyr-env
 ```
 
+## 
+```bash
+docker buildx build --platform linux/amd64,linux/arm64 -t jaybuckeye06/zephyr-env:v3.6.0 .
+```
+
 ## Customization
 
 The environment can be customized by:
