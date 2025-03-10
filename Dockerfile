@@ -25,11 +25,16 @@ FROM base AS sdk_stage
 ARG ZSDK_VERSION=0.16.6
 ENV ZSDK_VERSION=$ZSDK_VERSION
 
+COPY ./extra/debugger_arm64.tgz /extra/
+COPY ./extra/debugger_x86_64.tgz /extra/
+
 RUN if [ "$(uname -m)" = "x86_64" ]; then \
 	wget https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v$ZSDK_VERSION/zephyr-sdk-${ZSDK_VERSION}_linux-x86_64_minimal.tar.xz \
   && tar -xf zephyr-sdk-${ZSDK_VERSION}_linux-x86_64_minimal.tar.xz -C /opt/ \
   && rm zephyr-sdk-${ZSDK_VERSION}_linux-x86_64_minimal.tar.xz \
   && cd /opt/zephyr-sdk-$ZSDK_VERSION \
+  && mkdir -p /opt/JLink \
+  && tar --strip-components=1 -xf /extra/debugger_x86_64.tgz -C /opt/JLink \
   ; fi
 
 RUN if [ "$(uname -m)" = "aarch64" ] || [ "$(uname -m)" = "arm64" ]; then \
@@ -37,7 +42,11 @@ RUN if [ "$(uname -m)" = "aarch64" ] || [ "$(uname -m)" = "arm64" ]; then \
   && tar -xf zephyr-sdk-${ZSDK_VERSION}_linux-aarch64_minimal.tar.xz -C /opt/ \
   && rm zephyr-sdk-${ZSDK_VERSION}_linux-aarch64_minimal.tar.xz \
   && cd /opt/zephyr-sdk-$ZSDK_VERSION \
+  && mkdir -p /opt/JLink \
+  && tar --strip-components=1 -xf /extra/debugger_arm64.tgz -C /opt/JLink \
   ; fi
+
+RUN rm -rf /extra
 
 ADD sdk_toolchains /opt/zephyr-sdk-$ZSDK_VERSION/
 
@@ -67,6 +76,7 @@ RUN chown user:user /zephyrproject/west.yml \
 USER user
 WORKDIR /zephyrproject/example-application
 
+RUN echo "export PATH=/opt/JLink:\$PATH" >> /home/user/.bashrc
 # Default command
 CMD ["/bin/bash"]
 
