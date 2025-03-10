@@ -48,7 +48,7 @@ ADD west.yml /opt/zephyr-sdk-$ZSDK_VERSION/
 
 # Create non-root user
 RUN useradd -m -s /bin/bash user
-RUN mkdir /zephyrproject 
+RUN mkdir /zephyrproject /zephyrproject/workspace
 RUN chown -R user:user /zephyrproject
 USER user
 WORKDIR /zephyrproject
