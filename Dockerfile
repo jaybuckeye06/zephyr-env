@@ -62,6 +62,7 @@ RUN chown -R user:user /zephyrproject
 USER user
 WORKDIR /zephyrproject
 RUN west init -l --mf /opt/zephyr-sdk-0.16.6/west.yml test && west update
+RUN pip3 install -r /zephyrproject/zephyr/scripts/requirements.txt
 
 FROM src_stage AS final
 RUN git clone --branch v3.6.0 --depth 1 \
