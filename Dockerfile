@@ -22,7 +22,7 @@ RUN if [ "$(uname -m)" = "x86_64" ]; then \
 RUN pip install west pyelftools
 
 FROM base AS sdk_stage
-ARG ZSDK_VERSION=0.16.6
+ARG ZSDK_VERSION=0.17.0
 ENV ZSDK_VERSION=$ZSDK_VERSION
 
 COPY ./extra/debugger_arm64.tgz /extra/

@@ -27,6 +27,7 @@ manifest:
           - mbedtls # required by the mbedTLS library
           - net-tools # required by the net-tools module
           - segger # required by the Segger RTT library
+          - tinycrypt # required by bootloader
           - zcbor # required by the ZCBOR library
           - canopennode # For basic examples, but will be overridden by our 4.0.0+ module
 
