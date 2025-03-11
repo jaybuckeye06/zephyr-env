@@ -46,6 +46,8 @@ RUN if [ "$(uname -m)" = "aarch64" ] || [ "$(uname -m)" = "arm64" ]; then \
   && tar --strip-components=1 -xf /extra/debugger_arm64.tgz -C /opt/JLink \
   ; fi
 
+RUN ln -s /opt/zephyr-sdk-$ZSDK_VERSION /opt/zephyr-sdk
+
 RUN rm -rf /extra
 
 ADD sdk_toolchains /opt/zephyr-sdk-$ZSDK_VERSION/
@@ -61,7 +63,7 @@ RUN mkdir /zephyrproject /zephyrproject/workspace
 RUN chown -R user:user /zephyrproject
 USER user
 WORKDIR /zephyrproject
-RUN west init -l --mf /opt/zephyr-sdk-0.16.6/west.yml test && west update
+RUN west init -l --mf /opt/zephyr-sdk-$ZSDK_VERSION/west.yml test && west update
 RUN pip3 install -r /zephyrproject/zephyr/scripts/requirements.txt
 
 FROM src_stage AS final
