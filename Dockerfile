@@ -67,7 +67,7 @@ RUN west init -l --mf /opt/zephyr-sdk-$ZSDK_VERSION/west.yml test && west update
 RUN pip3 install -r /zephyrproject/zephyr/scripts/requirements.txt
 
 FROM src_stage AS final
-RUN git clone --branch v4.1.0 --depth 1 \
+RUN git clone --branch v4.0.0 --depth 1 \
     https://github.com/zephyrproject-rtos/example-application.git
 USER root
 ADD example-application.yml /zephyrproject/example-application/west.yml
