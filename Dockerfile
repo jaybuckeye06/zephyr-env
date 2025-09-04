@@ -1,8 +1,6 @@
 FROM ubuntu:22.04 AS base
 
-RUN --mount=type=cache,target=/var/cache/apt \
-  --mount=type=cache,target=/var/lib/apt \
-  apt update \
+RUN apt update \
   && DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends \
   git cmake ninja-build gperf ccache dfu-util device-tree-compiler wget curl \
   python3-dev python3-pip python3-setuptools python3-tk python3-wheel xz-utils file \
@@ -11,23 +9,17 @@ RUN --mount=type=cache,target=/var/cache/apt \
   clang-format clang-tidy cppcheck
 
 # Install multi-lib gcc (x86 only)
-RUN --mount=type=cache,target=/var/cache/apt \
-  --mount=type=cache,target=/var/lib/apt \
-  if [ "$(uname -m)" = "x86_64" ]; then \
+RUN if [ "$(uname -m)" = "x86_64" ]; then \
   apt update \
   && DEBIAN_FRONTEND=noninteractive apt install --no-install-recommends -y \
     gcc-multilib \
     g++-multilib \
   ; fi
 
-RUN --mount=type=cache,target=/root/.cache/pip \
-  pip install west pyelftools pre-commit
+RUN pip install west pyelftools pre-commit
 
 # Install Node.js and Claude Code CLI
-RUN --mount=type=cache,target=/var/cache/apt \
-  --mount=type=cache,target=/var/lib/apt \
-  --mount=type=cache,target=/root/.npm \
-  curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
   && apt-get install -y nodejs \
   && npm install -g @anthropic-ai/claude-code
 
@@ -77,8 +69,7 @@ RUN chown -R user:user /home/user/zephyr-project /zephyrproject
 # Initialize and update the shared Zephyr project
 USER user
 WORKDIR /home/user/zephyr-project
-RUN --mount=type=cache,target=/home/user/.cache/pip,uid=1000,gid=1000 \
-    cp /opt/zephyr-sdk-$ZSDK_VERSION/west.yml . && \
+RUN cp /opt/zephyr-sdk-$ZSDK_VERSION/west.yml . && \
     west init -l . && west update
 
 # Create symlink so /opt/zephyr-project points to user's directory
@@ -86,8 +77,7 @@ USER root
 RUN ln -sf /home/user/zephyr-project /opt/zephyr-project
 # Set up environment variables for the shared project
 USER user
-RUN --mount=type=cache,target=/home/user/.cache/pip,uid=1000,gid=1000 \
-    pip3 install -r /home/user/zephyr-project/zephyr/scripts/requirements.txt
+RUN pip3 install -r /home/user/zephyr-project/zephyr/scripts/requirements.txt
 
 USER root
 RUN echo "export ZEPHYR_BASE=/opt/zephyr-project/zephyr" >> /etc/environment && \
