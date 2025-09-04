@@ -55,20 +55,6 @@ jobs:
           base-path-to-features: "./zephyr-dev-features/src"
           generate-docs: "true"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GHCR_PAT }}
           REGISTRY: ghcr.io
           NAMESPACE: jaybuckeye06
-
-      - name: Create tgz package
-        run: |
-          mkdir -p dist
-          tar -czf dist/zephyr-dev-features-${{ steps.version.outputs.version }}.tgz -C zephyr-dev-features .
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ steps.version.outputs.tag }}
-          name: "zephyr-dev-features ${{ steps.version.outputs.tag }}"
-          files: dist/zephyr-dev-features-${{ steps.version.outputs.version }}.tgz
-          generate_release_notes: true
-          prerelease: false
