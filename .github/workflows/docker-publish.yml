@@ -79,8 +79,7 @@ jobs:
       - name: Create tgz package
         run: |
           mkdir -p dist
-          tar --exclude='.git' --exclude='node_modules' --exclude='dist' \
-              -czf dist/zephyr-dev-features-${{ steps.version.outputs.version }}.tgz .
+          tar -czf dist/zephyr-dev-features-${{ steps.version.outputs.version }}.tgz -C zephyr-dev-features .
       
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
