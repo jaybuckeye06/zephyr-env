@@ -45,8 +45,6 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish Dev Container Features
-        uses: devcontainers/action@v1
+        uses: devcontainers/feature-action@v1
         with:
-          publish-features: "true"
-          base-path-to-features: "./devcontainer-feature"
-          generate-docs: "true"
+          path: "./devcontainer-feature"
