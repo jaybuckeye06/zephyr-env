@@ -1,0 +1,42 @@
+{
+  "name": "Zephyr Development Environment", 
+  "image": "jaybuckeye06/zephyr-env:latest",
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "./features/zephyr-dev": {
+      "enableDebugging": true,
+      "enableCodeQuality": true,
+      "enableClaude": true
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "GitHub.copilot",
+        "GitHub.copilot-chat", 
+        "Anthropic.claude-code"
+      ]
+    }
+  },
+  "mounts": [
+    "source=${localWorkspaceFolder},target=/workdir,type=bind,consistency=cached"
+  ],
+  "workspaceFolder": "/workdir",
+  "remoteUser": "user",
+  "postCreateCommand": "echo 'Zephyr development environment ready!'",
+  "forwardPorts": [
+    2331,
+    19021
+  ],
+  "portsAttributes": {
+    "2331": {
+      "label": "J-Link GDB Server",
+      "onAutoForward": "notify"
+    },
+    "19021": {
+      "label": "J-Link RTT Viewer",
+      "onAutoForward": "notify"
+    }
+  }
+}
