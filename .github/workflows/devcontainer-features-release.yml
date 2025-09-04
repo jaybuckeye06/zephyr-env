@@ -52,8 +52,5 @@ jobs:
         uses: devcontainers/action@v1
         with:
           publish-features: "true"
-          base-path-to-features: "./zephyr-dev-features/src"
+          base-path-to-features: "./devcontainer-features"
           generate-docs: "true"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GHCR_PAT }}
-          REGISTRY: ghcr.io
