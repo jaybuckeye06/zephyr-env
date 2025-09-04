@@ -89,5 +89,6 @@ jobs:
           publish-features: "true"
           base-path-to-features: "./zephyr-dev-features/src"
           generate-docs: "true"
+          namespace: "ghcr.io/${{ github.repository_owner }}/zephyr-env"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
