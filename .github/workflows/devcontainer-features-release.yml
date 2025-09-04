@@ -1,9 +1,6 @@
 name: Release Dev Container Features
 
 on:
-  push:
-    branches:
-      - 'release/*'
   workflow_dispatch:
     inputs:
       version:

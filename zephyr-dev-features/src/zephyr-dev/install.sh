@@ -245,6 +245,9 @@ EOF
     chmod +x /usr/local/bin/zephyr-scripts/code-quality.sh
 fi
 
+# Setup J-Link remote IP
+
+
 # Add scripts to PATH
 echo 'export PATH="/usr/local/bin/zephyr-scripts:$PATH"' >> /etc/bash.bashrc
 

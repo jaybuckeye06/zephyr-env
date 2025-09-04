@@ -88,6 +88,9 @@ WORKDIR /home/user/zephyrproject/example-application
 RUN echo "export PATH=/opt/JLink:\$PATH" >> /home/user/.bashrc && \
     echo "export ZEPHYR_BASE=/home/user/zephyrproject/zephyr" >> /home/user/.bashrc && \
     echo "export ZEPHYR_PROJECT_ROOT=/home/user/zephyrproject" >> /home/user/.bashrc
+
+RUN echo "export IP=\$(nslookup host.docker.internal | grep 'Address:' | grep -Eo '([0-9]{1,3}\.){3}[0-9]{1,3}' | tail -n 1)" >> /home/user/.bashrc
+
 # Default command
 RUN west update
 CMD ["/bin/bash"]
