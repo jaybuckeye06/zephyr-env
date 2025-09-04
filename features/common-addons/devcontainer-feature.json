@@ -1,0 +1,90 @@
+{
+  "id": "common-addons",
+  "version": "1.0.0",
+  "name": "Zephyr RTOS Development Environment",
+  "description": "Comprehensive development environment for Zephyr RTOS with debugging, extensions, and tools",
+  "documentationURL": "https://github.com/zephyrproject-rtos/zephyr",
+  "licenseURL": "https://github.com/zephyrproject-rtos/zephyr/blob/main/LICENSE",
+  "options": {
+    "enableDebugging": {
+      "type": "boolean",
+      "default": true,
+      "description": "Enable hardware debugging support with J-Link"
+    },
+    "enableCodeQuality": {
+      "type": "boolean", 
+      "default": true,
+      "description": "Enable code quality tools (clang-format, cppcheck, pre-commit)"
+    },
+    "enableClaude": {
+      "type": "boolean",
+      "default": true,
+      "description": "Install Claude Code CLI and VS Code extension"
+    }
+  },
+  "installsAfter": [
+    "ghcr.io/devcontainers/features/common-utils"
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.cpptools-extension-pack",
+        "ms-vscode.cmake-tools", 
+        "ms-python.python",
+        "ms-python.flake8",
+        "ms-python.pylint",
+        "marus25.cortex-debug",
+        "dan-c-underwood.arm",
+        "zixuanwang.linkerscript",
+        "ms-vscode.vscode-serial-monitor",
+        "redhat.vscode-yaml",
+        "ms-vscode.hexeditor",
+        "GitHub.copilot",
+        "GitHub.copilot-chat", 
+        "Anthropic.claude-code"
+      ],
+      "settings": {
+        "files.associations": {
+          "*.overlay": "yaml",
+          "*.dts": "yaml", 
+          "*.dtsi": "yaml",
+          "Kconfig*": "kconfig",
+          "*.conf": "kconfig",
+          "*.defconfig": "kconfig",
+          "*.ld": "linkerscript",
+          "*.cmake": "cmake",
+          "CMakeLists.txt": "cmake"
+        },
+        "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+        "C_Cpp.default.compilerPath": "/opt/zephyr-sdk/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc",
+        "C_Cpp.default.includePath": [
+          "${containerWorkspaceFolder}/**",
+          "/opt/zephyr-project/zephyr/include/**",
+          "/opt/zephyr-sdk/arm-zephyr-eabi/arm-zephyr-eabi/include/**"
+        ],
+        "C_Cpp.default.defines": [
+          "__GNUC__",
+          "CONFIG_ZEPHYR_APP=1"
+        ],
+        "cmake.configureOnOpen": false,
+        "cmake.sourceDirectory": "${containerWorkspaceFolder}",
+        "cmake.buildDirectory": "${containerWorkspaceFolder}/build",
+        "python.defaultInterpreterPath": "/usr/bin/python3",
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "cortex-debug.armToolchainPath": "/opt/zephyr-sdk/arm-zephyr-eabi/bin",
+        "cortex-debug.JLinkGDBServerPath": "/opt/JLink/JLinkGDBServerCLExe",
+        "search.exclude": {
+          "**/build": true,
+          "**/zephyrproject": true,
+          "**/.west": true
+        },
+        "files.exclude": {
+          "**/build": true
+        },
+        "editor.tabSize": 2,
+        "editor.insertSpaces": true,
+        "editor.detectIndentation": false
+      }
+    }
+  }
+}

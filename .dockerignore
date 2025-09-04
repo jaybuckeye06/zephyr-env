@@ -1,0 +1,25 @@
+# Git files
+.git
+.gitignore
+
+# Documentation
+README.md
+*.md
+
+# IDE files
+.vscode/settings.json
+.vscode/launch.json
+
+# Build artifacts
+build/
+.west/
+zephyrproject/
+
+# Temporary files
+*.tmp
+*.log
+*~
+
+# OS files
+.DS_Store
+Thumbs.db

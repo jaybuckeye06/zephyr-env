@@ -1,0 +1,28 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+        args: ['--maxkb=500']
+      - id: check-case-conflict
+      - id: check-merge-conflict
+
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: v16.0.6
+    hooks:
+      - id: clang-format
+        files: \.(c|h|cpp|hpp|cc|cxx)$
+        args: [--style=file]
+
+  - repo: local
+    hooks:
+      - id: devicetree-format
+        name: devicetree format check
+        entry: scripts/check_devicetree_format.py
+        language: python
+        files: \.(dts|dtsi|overlay)$
+        pass_filenames: true
+        require_serial: false

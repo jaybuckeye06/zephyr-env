@@ -1,13 +1,12 @@
 FROM ubuntu:22.04 AS base
 
 RUN apt update \
-  && DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends git cmake ninja-build gperf \
-  ccache dfu-util device-tree-compiler wget \
+  && DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends \
+  git cmake ninja-build gperf ccache dfu-util device-tree-compiler wget curl \
   python3-dev python3-pip python3-setuptools python3-tk python3-wheel xz-utils file \
   make gcc libsdl2-dev libmagic1 srecord \
   tzdata dnsutils openssh-client \
-  && apt clean \
-  && rm -rf /var/lib/apt/lists/*
+  clang-format clang-tidy cppcheck
 
 # Install multi-lib gcc (x86 only)
 RUN if [ "$(uname -m)" = "x86_64" ]; then \
@@ -15,14 +14,17 @@ RUN if [ "$(uname -m)" = "x86_64" ]; then \
   && DEBIAN_FRONTEND=noninteractive apt install --no-install-recommends -y \
     gcc-multilib \
     g++-multilib \
-  && apt clean \
-  && rm -rf /var/lib/apt/lists/* \
   ; fi
 
-RUN pip install west pyelftools
+RUN pip install west pyelftools pre-commit
+
+# Install Node.js and Claude Code CLI
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+  && apt-get install -y nodejs \
+  && npm install -g @anthropic-ai/claude-code
 
 FROM base AS sdk_stage
-ARG ZSDK_VERSION=0.17.0
+ARG ZSDK_VERSION=0.16.9
 ENV ZSDK_VERSION=$ZSDK_VERSION
 
 COPY ./extra/debugger_arm64.tgz /extra/
@@ -59,27 +61,34 @@ ADD west.yml /opt/zephyr-sdk-$ZSDK_VERSION/
 
 # Create non-root user
 RUN useradd -m -s /bin/bash user
-RUN mkdir /zephyrproject /zephyrproject/workspace
-RUN chown -R user:user /zephyrproject
+
+# Create a shared Zephyr project directory that can be reused
 USER user
-WORKDIR /zephyrproject
+RUN mkdir -p /home/user/zephyrproject /home/user/zephyrproject/workspace
+
+# Initialize and update the shared Zephyr project
+WORKDIR /home/user/zephyrproject
 RUN west init -l --mf /opt/zephyr-sdk-$ZSDK_VERSION/west.yml test && west update
-RUN pip3 install -r /zephyrproject/zephyr/scripts/requirements.txt
+
+# Set up environment variables for the shared project
+RUN pip3 install -r /home/user/zephyrproject/zephyr/scripts/requirements.txt
 
 FROM src_stage AS final
-RUN git clone --branch v4.1.0 --depth 1 \
-    https://github.com/zephyrproject-rtos/example-application.git
-USER root
-ADD example-application.yml /zephyrproject/example-application/west.yml
-ADD west_config /zephyrproject/.west/config
-ADD west.yml /zephyrproject/west.yml
-RUN chown user:user /zephyrproject/west.yml \
-    /zephyrproject/example-application/west.yml \
-    /zephyrproject/.west/config
 USER user
-WORKDIR /zephyrproject/example-application
+RUN git clone --branch v3.6.0 --depth 1 \
+    https://github.com/zephyrproject-rtos/example-application.git
+ADD --chown=user:user example-application.yml /home/user/zephyrproject/example-application/west.yml
+ADD --chown=user:user west_config /home/user/zephyrproject/.west/config
+ADD --chown=user:user west.yml /home/user/zephyrproject/west.yml
+WORKDIR /home/user/zephyrproject/example-application
 
-RUN echo "export PATH=/opt/JLink:\$PATH" >> /home/user/.bashrc
+RUN echo "export PATH=/opt/JLink:\$PATH" >> /home/user/.bashrc && \
+    echo "export ZEPHYR_BASE=/home/user/zephyrproject/zephyr" >> /home/user/.bashrc && \
+    echo "export ZEPHYR_PROJECT_ROOT=/home/user/zephyrproject" >> /home/user/.bashrc
+
+RUN echo "export IP=\$(nslookup host.docker.internal | grep 'Address:' | grep -Eo '([0-9]{1,3}\.){3}[0-9]{1,3}' | tail -n 1)" >> /home/user/.bashrc
+
 # Default command
+RUN west update
 CMD ["/bin/bash"]
 

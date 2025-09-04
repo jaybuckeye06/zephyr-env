@@ -36,11 +36,7 @@ jobs:
             echo "version=$VERSION" >> $GITHUB_OUTPUT
             echo "tag=v$VERSION" >> $GITHUB_OUTPUT
           fi
-
-      - name: Update feature version in JSON
-        run: |
-          sed -i 's/"version": "[^"]*"/"version": "${{ steps.version.outputs.version }}"/' zephyr-dev-features/src/zephyr-dev/devcontainer-feature.json
-
+          
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
@@ -52,5 +48,8 @@ jobs:
         uses: devcontainers/action@v1
         with:
           publish-features: "true"
-          base-path-to-features: "./devcontainer-feature"
+          base-path-to-features: "./features"
           generate-docs: "true"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
