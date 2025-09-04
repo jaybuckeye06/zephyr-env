@@ -58,7 +58,7 @@
         "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
         "C_Cpp.default.compilerPath": "/opt/zephyr-sdk/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc",
         "C_Cpp.default.includePath": [
-          "${workspaceFolder}/**",
+          "${containerWorkspaceFolder}/**",
           "/opt/zephyr-project/zephyr/include/**",
           "/opt/zephyr-sdk/arm-zephyr-eabi/arm-zephyr-eabi/include/**"
         ],
@@ -67,8 +67,8 @@
           "CONFIG_ZEPHYR_APP=1"
         ],
         "cmake.configureOnOpen": false,
-        "cmake.sourceDirectory": "${workspaceFolder}",
-        "cmake.buildDirectory": "${workspaceFolder}/build",
+        "cmake.sourceDirectory": "${containerWorkspaceFolder}",
+        "cmake.buildDirectory": "${containerWorkspaceFolder}/build",
         "python.defaultInterpreterPath": "/usr/bin/python3",
         "terminal.integrated.defaultProfile.linux": "bash",
         "cortex-debug.armToolchainPath": "/opt/zephyr-sdk/arm-zephyr-eabi/bin",
@@ -84,68 +84,7 @@
         "editor.tabSize": 2,
         "editor.insertSpaces": true,
         "editor.detectIndentation": false
-      },
-      "tasks": [
-        {
-          "label": "Zephyr: Build",
-          "type": "shell",
-          "command": "west",
-          "args": ["build"],
-          "group": {
-            "kind": "build",
-            "isDefault": true
-          },
-          "problemMatcher": ["$gcc"],
-          "presentation": {
-            "echo": true,
-            "reveal": "always",
-            "focus": false,
-            "panel": "shared"
-          }
-        },
-        {
-          "label": "Zephyr: Clean Build",
-          "type": "shell", 
-          "command": "west",
-          "args": ["build", "-t", "clean"],
-          "group": "build"
-        },
-        {
-          "label": "Zephyr: Flash",
-          "type": "shell",
-          "command": "west", 
-          "args": ["flash"],
-          "group": "build",
-          "dependsOn": "Zephyr: Build"
-        },
-        {
-          "label": "Zephyr: Menuconfig",
-          "type": "shell",
-          "command": "west",
-          "args": ["build", "-t", "menuconfig"],
-          "group": "build"
-        }
-      ]
-    }
-  },
-  "mounts": [
-    "source=${localWorkspaceFolder},target=/workdir,type=bind,consistency=cached"
-  ],
-  "workspaceFolder": "/workdir",
-  "remoteUser": "user",
-  "postCreateCommand": "echo 'Zephyr development environment ready!'",
-  "forwardPorts": [
-    2331,
-    19021
-  ],
-  "portsAttributes": {
-    "2331": {
-      "label": "J-Link GDB Server",
-      "onAutoForward": "notify"
-    },
-    "19021": {
-      "label": "J-Link RTT Viewer",
-      "onAutoForward": "notify"
+      }
     }
   }
 }
