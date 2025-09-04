@@ -63,42 +63,29 @@ ADD west.yml /opt/zephyr-sdk-$ZSDK_VERSION/
 RUN useradd -m -s /bin/bash user
 
 # Create a shared Zephyr project directory that can be reused
-RUN mkdir -p /home/user/zephyr-project /zephyrproject /zephyrproject/workspace
-RUN chown -R user:user /home/user/zephyr-project /zephyrproject
+USER user
+RUN mkdir -p /home/user/zephyrproject /home/user/zephyrproject/workspace
 
 # Initialize and update the shared Zephyr project
-USER user
-WORKDIR /home/user/zephyr-project
-RUN cp /opt/zephyr-sdk-$ZSDK_VERSION/west.yml . && \
-    west init -l . && west update
+WORKDIR /home/user/zephyrproject
+RUN west init -l --mf /opt/zephyr-sdk-$ZSDK_VERSION/west.yml test && west update
 
-# Create symlink so /opt/zephyr-project points to user's directory
-USER root
-RUN ln -sf /home/user/zephyr-project /opt/zephyr-project
 # Set up environment variables for the shared project
-USER user
-RUN pip3 install -r /home/user/zephyr-project/zephyr/scripts/requirements.txt
-
-USER root
-RUN echo "export ZEPHYR_BASE=/opt/zephyr-project/zephyr" >> /etc/environment && \
-    echo "export ZEPHYR_PROJECT_ROOT=/opt/zephyr-project" >> /etc/environment
+RUN pip3 install -r /home/user/zephyrproject/zephyr/scripts/requirements.txt
 
 FROM src_stage AS final
+USER user
 RUN git clone --branch v3.6.0 --depth 1 \
     https://github.com/zephyrproject-rtos/example-application.git
-USER root
-ADD example-application.yml /zephyrproject/example-application/west.yml
-ADD west_config /zephyrproject/.west/config
-ADD west.yml /zephyrproject/west.yml
-RUN chown user:user /zephyrproject/west.yml \
-    /zephyrproject/example-application/west.yml \
-    /zephyrproject/.west/config
-USER user
-WORKDIR /zephyrproject/example-application
+ADD example-application.yml /home/user/zephyrproject/example-application/west.yml
+ADD west_config /home/user/zephyrproject/.west/config
+ADD west.yml /home/user/zephyrproject/west.yml
+WORKDIR /home/user/zephyrproject/example-application
 
 RUN echo "export PATH=/opt/JLink:\$PATH" >> /home/user/.bashrc && \
-    echo "export ZEPHYR_BASE=/opt/zephyr-project/zephyr" >> /home/user/.bashrc && \
-    echo "export ZEPHYR_PROJECT_ROOT=/opt/zephyr-project" >> /home/user/.bashrc
+    echo "export ZEPHYR_BASE=/home/user/zephyrproject/zephyr" >> /home/user/.bashrc && \
+    echo "export ZEPHYR_PROJECT_ROOT=/home/user/zephyrproject" >> /home/user/.bashrc
 # Default command
+RUN west update
 CMD ["/bin/bash"]
 
