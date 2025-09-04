@@ -18,6 +18,32 @@ if [ "$ENABLE_CODE_QUALITY" = "true" ]; then
     rm -rf /var/lib/apt/lists/*
 fi
 
+# Install VS Code extensions
+echo "Installing VS Code extensions..."
+VSCODE_EXTENSIONS=(
+    "ms-vscode.cpptools-extension-pack"
+    "ms-vscode.cmake-tools"
+    "ms-python.python"
+    "ms-python.flake8"
+    "ms-python.pylint"
+    "marus25.cortex-debug"
+    "dan-c-underwood.arm"
+    "zixuanwang.linkerscript"
+    "ms-vscode.vscode-serial-monitor"
+    "redhat.vscode-yaml"
+    "ms-vscode.hexeditor"
+    "GitHub.copilot"
+    "GitHub.copilot-chat"
+    "Anthropic.claude-code"
+)
+
+# Install extensions for all users
+mkdir -p /usr/local/share/code-server/extensions
+for extension in "${VSCODE_EXTENSIONS[@]}"; do
+    echo "Installing VS Code extension: $extension"
+    code --install-extension "$extension" --force || echo "Failed to install $extension, continuing..."
+done
+
 # Install Claude Code if enabled
 if [ "$ENABLE_CLAUDE" = "true" ]; then
     echo "Installing Claude Code CLI..."

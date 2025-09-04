@@ -73,13 +73,16 @@ RUN west init -l --mf /opt/zephyr-sdk-$ZSDK_VERSION/west.yml test && west update
 # Set up environment variables for the shared project
 RUN pip3 install -r /home/user/zephyrproject/zephyr/scripts/requirements.txt
 
+# Add devcontainer feature files for use with VS Code devcontainers
+ADD zephyr-dev-features /home/user/zephyrproject/workspace/.devcontainer/features/
+
 FROM src_stage AS final
 USER user
 RUN git clone --branch v3.6.0 --depth 1 \
     https://github.com/zephyrproject-rtos/example-application.git
-ADD example-application.yml /home/user/zephyrproject/example-application/west.yml
-ADD west_config /home/user/zephyrproject/.west/config
-ADD west.yml /home/user/zephyrproject/west.yml
+ADD --chown=user:user example-application.yml /home/user/zephyrproject/example-application/west.yml
+ADD --chown=user:user west_config /home/user/zephyrproject/.west/config
+ADD --chown=user:user west.yml /home/user/zephyrproject/west.yml
 WORKDIR /home/user/zephyrproject/example-application
 
 RUN echo "export PATH=/opt/JLink:\$PATH" >> /home/user/.bashrc && \
