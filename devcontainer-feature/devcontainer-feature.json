@@ -1,5 +1,5 @@
 {
-  "id": "zephyr-dev",
+  "id": "zephyr-devcontainer",
   "version": "1.0.0",
   "name": "Zephyr RTOS Development Environment",
   "description": "Comprehensive development environment for Zephyr RTOS with debugging, extensions, and tools",
