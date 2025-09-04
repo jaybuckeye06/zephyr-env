@@ -62,7 +62,7 @@ jobs:
     if: startsWith(github.ref, 'refs/heads/release/') && contains(github.ref, 'v')
     permissions:
       contents: write
-      packages: read
+      packages: write
     
     steps:
       - name: Checkout repository
@@ -75,17 +75,19 @@ jobs:
           VERSION=$(echo $BRANCH_NAME | grep -oP 'v\K[0-9]+\.[0-9]+\.[0-9]+')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "tag=v$VERSION" >> $GITHUB_OUTPUT
-      
-      - name: Create tgz package
-        run: |
-          mkdir -p dist
-          tar -czf dist/zephyr-dev-features-${{ steps.version.outputs.version }}.tgz -C zephyr-dev-features .
-      
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
         with:
-          tag_name: ${{ steps.version.outputs.tag }}
-          name: "zephyr-dev-features ${{ steps.version.outputs.tag }}"
-          files: dist/zephyr-dev-features-${{ steps.version.outputs.version }}.tgz
-          generate_release_notes: true
-          prerelease: false
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish Dev Container Features
+        uses: devcontainers/action@v1
+        with:
+          publish-features: "true"
+          base-path-to-features: "./zephyr-dev-features"
+          generate-docs: "true"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
